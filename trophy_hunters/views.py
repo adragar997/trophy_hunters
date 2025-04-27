@@ -34,7 +34,14 @@ class GetGameAchievements(APIView):
     pass
 
 class GetPlayerDetails(APIView):
-    pass
+    def get(self, request, *args, **kwargs):
+        url = f'{os.environ['URL_PLAYER_DETAILS']}'
+        params = {
+            'key' : f'{os.environ['STEAM_API_TOKEN']}',
+            'steamids' : self.kwargs['steamid']
+        }
+        data = requests.get(url, params=params).json()
+        return Response(data=data, status=200)
 
 class GetPlayerGames(APIView):
     pass
