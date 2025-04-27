@@ -61,4 +61,10 @@ class GetPlayerGames(APIView):
         return Response(data=data, status=200)
 
 class GetShopDetails(APIView):
-    pass
+    def get(self, request, *args, **kwargs):
+        url = f'{os.environ['URL_SHOP_GAME']}'
+        params = {
+            'appids': self.kwargs['appid'],
+        }
+        data = requests.get(url, params=params).json()
+        return Response(data=data, status=200)
