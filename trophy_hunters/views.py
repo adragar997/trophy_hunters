@@ -18,7 +18,14 @@ class GetGames(APIView):
         return Response(data=games, status=200)
 
 class GetPlayerSteamid(APIView):
-    pass
+    def get(self, request, *args, **kwargs):
+        url = f'{os.environ['URL_RESOLVE_VANITY']}'
+        params = {
+            'key' : f'{os.environ['STEAM_API_TOKEN']}',
+            'vanityurl' : self.kwargs['username'],
+        }
+        data = requests.get(url, params=params).json()
+        return Response(data=data, status=200)
 
 class GetGameNews(APIView):
     pass
