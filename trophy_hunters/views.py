@@ -5,7 +5,7 @@ from django.shortcuts import render
 import requests
 import os
 
-class GameList(APIView):
+class GetGames(APIView):
     def get(self, request):
         url = f'{os.environ['URL_GAME_LIST']}'
         games = []
@@ -16,3 +16,21 @@ class GameList(APIView):
                 games.append(game)
 
         return Response(data=games, status=200)
+
+class GetPlayerSteamid(APIView):
+    pass
+
+class GetGameNews(APIView):
+    pass
+
+class GetGameAchievements(APIView):
+    pass
+
+class GetPlayerDetails(APIView):
+    pass
+
+class GetPlayerGames(APIView):
+    pass
+
+class GetShopDetails(APIView):
+    pass
