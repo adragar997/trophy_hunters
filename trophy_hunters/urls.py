@@ -1,5 +1,6 @@
 from django.urls import path
 from . import  views
+from .views import FetchData
 
 urlpatterns = [
     path('games/', views.GetGames.as_view(), name='GetGames'),
@@ -9,4 +10,5 @@ urlpatterns = [
     path('player/<int:steamid>/games/<int:appid>/', views.GetGameAchievements.as_view(), name='GetGameAchievements'),
     path('shop/<int:appid>/', views.GetShopDetails.as_view(), name='GetShopDetails'),
     path('steamid/<str:username>/', views.GetPlayerSteamid.as_view(), name='GetPlayerSteamid'),
+    path('fetch-data/', FetchData.as_view(), name='FetchData'),
 ]

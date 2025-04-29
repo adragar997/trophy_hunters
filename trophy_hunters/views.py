@@ -1,7 +1,9 @@
 from django.contrib.sites import requests
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.shortcuts import render
+from adrf.views import APIView as AsyncAPIView
+from .async_fetch_data import AsyncFetchData
+from .request_requirements import requirements
 import requests
 import os
 
@@ -76,4 +78,9 @@ class GetShopDetails(APIView):
             'appids': self.kwargs['appid'],
         }
         data = requests.get(url, params=params).json()
+        return Response(data=data, status=200)
+
+class FetchData(AsyncAPIView):
+    async def get(self, request):
+        data = await AsyncFetchData().create_session(requirements)
         return Response(data=data, status=200)
