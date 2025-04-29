@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'trophy_hunters.apps.TrophyHuntersConfig',
+    'adrf',
 ]
 
 MIDDLEWARE = [
