@@ -31,6 +31,19 @@ class Game(models.Model):
     def __str__(self):
         return self.name
 
+    def to_dict(self):
+        return {
+            'app_id': self.app_id,
+            'name': self.name,
+            'cover': self.cover,
+            'gallery': self.gallery,
+            'trophy_count': self.trophy_count,
+            'price': self.price,
+            'trailer': self.trailer,
+            'age_required': self.age_required,
+            'owner': self.owner.name,
+        }
+
 class GameOwnership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
