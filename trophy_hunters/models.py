@@ -18,10 +18,8 @@ class Game(models.Model):
     app_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=150)
     cover = models.URLField()
-    gallery = models.JSONField()
     trophy_count = models.IntegerField()
-    price = models.IntegerField()
-    trailer = models.JSONField()
+    price = models.FloatField()
     age_required = models.IntegerField()
     owner = models.ManyToManyField(User, through='GameOwnership')
 
@@ -43,6 +41,14 @@ class Game(models.Model):
             'age_required': self.age_required,
             'owner': self.owner.name,
         }
+
+class Gallery(models.Model):
+    url = models.URLField()
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+
+class Trailer(models.Model):
+    url = models.URLField()
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
 class GameOwnership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
