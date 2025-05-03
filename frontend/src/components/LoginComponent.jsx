@@ -1,22 +1,21 @@
 import {useState, useEffect} from "react";
 
 function LoginComponent() {
-    const user = {
-        'username': '',
-        'password': '',
-    }
+    const [formData, setFormData] = useState(
+        {
+            'username': '',
+            'password': '',
+        }
+    )
 
-    const setUsername = (e) => {
-        user.username = e.target.value
-    }
-
-    const setPassword = (e) => {
-        user.password = e.target.value
+    const handleChange = (e) => {
+        const {id, value} = e.target
+        setFormData(prev => ({...prev, [id]:value}))
     }
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        console.log(user)
+        console.log(formData)
     }
 
     return (
@@ -24,10 +23,10 @@ function LoginComponent() {
             <h1>LOGIN</h1>
             <form method="post" onSubmit={handleSubmit}>
                 <label htmlFor="username">Username</label>
-                <input type="text" id="username" onChange={setUsername}/>
+                <input type="text" id="username" onChange={handleChange}/>
 
                 <label htmlFor="password">Password</label>
-                <input type="text" id="password" onChange={setPassword}/>
+                <input type="text" id="password" onChange={handleChange}/>
 
                 <button type="submit">Iniciar sesion</button>
             </form>
