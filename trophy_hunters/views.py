@@ -5,11 +5,14 @@ from adrf.views import APIView as AsyncAPIView
 from .fetch_data import AsyncFetchData
 from .serializers import GameSerializer, ShopSerializer
 from asgiref.sync import sync_to_async
+from rest_framework.permissions import IsAuthenticated
 import requests
 import os
 from .models import *
 
 class GetGames(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         games = [game.to_dict() for game in Game.objects.all()]
         """url = f'{os.environ['URL_GAME_LIST']}'
