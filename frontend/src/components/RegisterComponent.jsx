@@ -1,4 +1,5 @@
 import {useState, useEffect} from "react";
+import '../assets/css/Register.css';
 
 function RegisterComponent() {
     const [formData, setFormData] = useState(
@@ -30,7 +31,7 @@ function RegisterComponent() {
     }
 
     return (
-        <div>
+        <div className='container'>
             <h1>Formulario de registro</h1>
             <form method="post" onSubmit={handleSubmit}>
                 <label htmlFor="username">Usuario</label>

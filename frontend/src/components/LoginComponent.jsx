@@ -1,4 +1,5 @@
 import {useState, useEffect} from "react";
+import '../assets/css/Login.css'
 
 function LoginComponent() {
     const [formData, setFormData] = useState(
@@ -26,19 +27,22 @@ function LoginComponent() {
             const credentials = await response.json()
             localStorage.setItem('access', credentials.access)
             localStorage.setItem('refresh', credentials.refresh)
-            console.log("accesso concedido")
+            alert(`Bienvenido ${formData.username}`)
+        } else {
+            const error = await response.json()
+            alert(`${error.detail}`)
         }
     }
 
     return (
-        <div>
+        <div className="container">
             <h1>LOGIN</h1>
             <form method="post" onSubmit={handleSubmit}>
                 <label htmlFor="username">Username</label>
                 <input type="text" id="username" onChange={handleChange}/>
 
                 <label htmlFor="password">Password</label>
-                <input type="text" id="password" onChange={handleChange}/>
+                <input type="password" id="password" onChange={handleChange}/>
 
                 <button type="submit">Iniciar sesion</button>
             </form>
