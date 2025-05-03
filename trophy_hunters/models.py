@@ -17,12 +17,11 @@ class Profile(models.Model):
 class Game(models.Model):
     app_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=150)
-    cover = models.URLField()
-    gallery = models.JSONField()
-    trophy_count = models.IntegerField()
-    price = models.IntegerField()
-    trailer = models.JSONField()
-    age_required = models.IntegerField()
+    cover = models.URLField(null=True, blank=True)
+    trophy_count = models.IntegerField(null=True, blank=True)
+    price = models.FloatField(null=True, blank=True)
+    release_date = models.DateField(null=True, blank=True)
+    age_required = models.IntegerField(null=True, blank=True)
     owner = models.ManyToManyField(User, through='GameOwnership')
 
     class Meta:
@@ -36,13 +35,20 @@ class Game(models.Model):
             'app_id': self.app_id,
             'name': self.name,
             'cover': self.cover,
-            'gallery': self.gallery,
             'trophy_count': self.trophy_count,
             'price': self.price,
-            'trailer': self.trailer,
+            'release_date': self.release_date,
             'age_required': self.age_required,
             'owner': self.owner.name,
         }
+
+class Gallery(models.Model):
+    url = models.URLField()
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+
+class Trailer(models.Model):
+    url = models.URLField()
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
 class GameOwnership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

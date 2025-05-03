@@ -11,5 +11,7 @@ admin.site.register(
         DLC,
         Developer,
         Publisher,
+        Trailer,
+        Gallery,
     ]
 )

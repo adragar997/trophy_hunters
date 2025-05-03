@@ -2,21 +2,27 @@ from django.contrib.sites import requests
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from adrf.views import APIView as AsyncAPIView
-from .async_fetch_data import AsyncFetchData
-from .request_requirements import requirements
+from .fetch_data import AsyncFetchData
+from .serializers import GameSerializer, ShopSerializer
+from asgiref.sync import sync_to_async
+from rest_framework.permissions import IsAuthenticated
 import requests
 import os
+from .models import *
 
 class GetGames(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
-        url = f'{os.environ['URL_GAME_LIST']}'
+        games = [game.to_dict() for game in Game.objects.all()]
+        """url = f'{os.environ['URL_GAME_LIST']}'
         games = []
         data = requests.get(url).json()
 
         for game in data['applist']['apps']:
             if game['name'] != "":
                 games.append(game)
-
+"""
         return Response(data=games, status=200)
 
 class GetPlayerSteamid(APIView):
@@ -80,7 +86,34 @@ class GetShopDetails(APIView):
         data = requests.get(url, params=params).json()
         return Response(data=data, status=200)
 
-class FetchData(AsyncAPIView):
-    async def get(self, request):
-        data = await AsyncFetchData().create_session(requirements)
-        return Response(data=data, status=200)
+class FetchGamesData(AsyncAPIView):
+    async def get(self, request, *args, **kwargs):
+        try:
+            url = f'{os.getenv('URL_GAME_LIST')}'
+            data = await AsyncFetchData().create_session(url)
+            games = [game for game in data['applist']['apps'] if game['name']]
+
+            for game in games:
+                serializer = GameSerializer(data=game)
+                if serializer.is_valid():
+                    await sync_to_async(serializer.save)()
+                else:
+                    return Response(serializer.errors, status=400)
+            return Response({'message': 'Games was successfully saved'}, status=200)
+        except Exception as e:
+            return Response({'error': e}, status=500)
+
+class FetchShopData(AsyncAPIView):
+    async def get(self, request, *args, **kwargs):
+        try:
+            url = f'{os.getenv('URL_SHOP_GAME')}'
+            params = {
+                'appids': self.kwargs['appid'],
+            }
+            data = await AsyncFetchData().create_session(url, params)
+
+            for game_data in data[self.kwargs['appid']]['data']:
+                serializer = ShopSerializer(data=game_data)
+            return Response(data=data, status=200)
+        except Exception as e:
+            return Response({'error': e}, status=500)
