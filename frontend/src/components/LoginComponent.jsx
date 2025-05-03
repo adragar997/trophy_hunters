@@ -13,9 +13,21 @@ function LoginComponent() {
         setFormData(prev => ({...prev, [id]:value}))
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log(formData)
+
+        const response = await fetch('http://127.0.0.1:8000/trophyhunters/token/',{
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+        })
+
+        if (response.ok){
+            const credentials = await response.json()
+            localStorage.setItem('access', credentials.access)
+            localStorage.setItem('refresh', credentials.refresh)
+            console.log("accesso concedido")
+        }
     }
 
     return (
