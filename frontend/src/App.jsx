@@ -3,14 +3,17 @@ import NavComponent from "./components/NavComponent.jsx";
 import './App.css'
 import {Route, Routes} from "react-router-dom";
 import RegisterComponent from "./components/RegisterComponent.jsx";
+import {useState} from "react";
 
 function App() {
+    const [user, setUser] = useState()
+
   return (
     <div>
-        <NavComponent />
+        <NavComponent user={user} />
         <Routes>
             <Route path="trophyhunters/register" element={<RegisterComponent/>}/>
-            <Route path="trophyhunters/login" element={<LoginComponent/>}/>
+            <Route path="trophyhunters/login" element={<LoginComponent setUser={setUser}/>}/>
         </Routes>
     </div>
   )

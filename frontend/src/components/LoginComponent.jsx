@@ -1,7 +1,7 @@
 import {useState, useEffect} from "react";
 import '../assets/css/Login.css'
 
-function LoginComponent() {
+function LoginComponent(props) {
     const [formData, setFormData] = useState(
         {
             'username': '',
@@ -27,7 +27,10 @@ function LoginComponent() {
             const credentials = await response.json()
             localStorage.setItem('access', credentials.access)
             localStorage.setItem('refresh', credentials.refresh)
-            alert(`Bienvenido ${formData.username}`)
+
+            props.setUser(
+                {'username':formData.username}
+            )
         } else {
             const error = await response.json()
             alert(`${error.detail}`)
