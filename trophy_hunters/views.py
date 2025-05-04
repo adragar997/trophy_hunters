@@ -122,8 +122,15 @@ class FetchShopData(AsyncAPIView):
 class Register(AsyncAPIView):
     parser_classes = [MultiPartParser, FormParser]
     async def post(self, request):
-        serializer = ProfileSerializer(data=request.data)
+        serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             await sync_to_async(serializer.save)()
             return Response(data={'message':'success'}, status=200)
         return Response(serializer.errors, status=400)
+
+class Profile(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, *args, **kwargs):
+        profile = request.user.profile
+        serializer = ProfileSerializer(profile, context={'request': request})
+        return Response(data=serializer.data, status=200)

@@ -22,4 +22,5 @@ urlpatterns = [
 
     # REGISTER
     path('register/', views.Register.as_view(), name='register'),
+    path('profile/me/', views.Profile.as_view(), name='profile'),
 ]
