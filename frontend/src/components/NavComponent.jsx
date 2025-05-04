@@ -1,4 +1,5 @@
 import {Link} from "react-router-dom";
+import '../assets/css/Navbar.css'
 
 function NavComponent(props) {
     const {user} = props

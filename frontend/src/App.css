@@ -12,14 +12,6 @@ input {
   letter-spacing: 1px;
 }
 
-ul {
-  list-style: none;
-}
-
-ul {
-  display: flex;
-}
-
 form * {
     display: block;
     margin: auto;
