@@ -34,7 +34,7 @@ class ProfileSerializer(serializers.Serializer):
         firstname = validated_data.pop('firstname')
         lastname = validated_data.pop('lastname')
 
-        user = User.objects.create(
+        user = User.objects.create_user(
             username=username,
             password=password,
             first_name=firstname,
