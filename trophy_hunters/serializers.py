@@ -18,7 +18,7 @@ class ShopSerializer(serializers.ModelSerializer):
     class Meta:
         model = Game
 
-class ProfileSerializer(serializers.Serializer):
+class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
     firstname = serializers.CharField()
@@ -43,3 +43,17 @@ class ProfileSerializer(serializers.Serializer):
         birthdate = validated_data.pop('birthdate')
 
         return Profile.objects.create(user=user, birth_date=birthdate,**validated_data)
+
+class ProfileSerializer(serializers.ModelSerializer):
+    username  = serializers.CharField(source='user.username', read_only=True)
+    firstname = serializers.CharField(source='user.first_name', read_only=True)
+    lastname  = serializers.CharField(source='user.last_name', read_only=True)
+    avatar    = serializers.ImageField()
+    banner    = serializers.ImageField()
+    bio       = serializers.CharField()
+    birthdate = serializers.DateField(source='birth_date', read_only=True)
+
+    class Meta:
+        model  = Profile
+        fields = ['username', 'firstname', 'lastname', 'avatar',
+                  'banner', 'bio', 'birthdate']
