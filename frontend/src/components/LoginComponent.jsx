@@ -1,4 +1,5 @@
 import {useState, useEffect} from "react";
+import { useNavigate } from 'react-router-dom';
 import '../assets/css/Login.css'
 
 function LoginComponent(props) {
@@ -8,6 +9,8 @@ function LoginComponent(props) {
             'password': '',
         }
     )
+    const navigate = useNavigate()
+
 
     const handleChange = (e) => {
         const {id, value} = e.target
@@ -31,6 +34,7 @@ function LoginComponent(props) {
             props.setUser(
                 {'username':formData.username}
             )
+            navigate('/trophyhunters/register')
         } else {
             const error = await response.json()
             alert(`${error.detail}`)
