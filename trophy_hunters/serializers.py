@@ -17,3 +17,29 @@ class ShopSerializer(serializers.ModelSerializer):
     required_age = serializers.IntegerField(source='age_required')
     class Meta:
         model = Game
+
+class ProfileSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
+    firstname = serializers.CharField()
+    lastname = serializers.CharField()
+    avatar = serializers.ImageField()
+    banner = serializers.ImageField()
+    bio = serializers.CharField()
+    birthdate = serializers.DateField()
+
+    def create(self, validated_data):
+        username = validated_data.pop('username')
+        password = validated_data.pop('password')
+        firstname = validated_data.pop('firstname')
+        lastname = validated_data.pop('lastname')
+
+        user = User.objects.create(
+            username=username,
+            password=password,
+            first_name=firstname,
+            last_name=lastname,
+        )
+        birthdate = validated_data.pop('birthdate')
+
+        return Profile.objects.create(user=user, birth_date=birthdate,**validated_data)
