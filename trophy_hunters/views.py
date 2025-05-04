@@ -1,9 +1,10 @@
 from django.contrib.sites import requests
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from adrf.views import APIView as AsyncAPIView
 from .fetch_data import AsyncFetchData
-from .serializers import GameSerializer, ShopSerializer
+from .serializers import *
 from asgiref.sync import sync_to_async
 from rest_framework.permissions import IsAuthenticated
 import requests
@@ -117,3 +118,12 @@ class FetchShopData(AsyncAPIView):
             return Response(data=data, status=200)
         except Exception as e:
             return Response({'error': e}, status=500)
+
+class Register(AsyncAPIView):
+    parser_classes = [MultiPartParser, FormParser]
+    async def post(self, request):
+        serializer = ProfileSerializer(data=request.data)
+        if serializer.is_valid():
+            await sync_to_async(serializer.save)()
+            return Response(data={'message':'success'}, status=200)
+        return Response(serializer.errors, status=400)
