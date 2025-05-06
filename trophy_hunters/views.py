@@ -1,7 +1,9 @@
 from django.contrib.sites import requests
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from adrf.views import APIView as AsyncAPIView
 from .fetch_data import AsyncFetchData
 from .serializers import *
@@ -11,20 +13,11 @@ import requests
 import os
 from .models import *
 
-class GetGames(APIView):
+class GetGames(ListAPIView):
     permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        games = [game.to_dict() for game in Game.objects.all()]
-        """url = f'{os.environ['URL_GAME_LIST']}'
-        games = []
-        data = requests.get(url).json()
-
-        for game in data['applist']['apps']:
-            if game['name'] != "":
-                games.append(game)
-"""
-        return Response(data=games, status=200)
+    queryset = Game.objects.all()
+    serializer_class = GameSerializer
+    pagination_class = PageNumberPagination
 
 class GetPlayerSteamid(APIView):
     def get(self, request, *args, **kwargs):
@@ -58,15 +51,10 @@ class GetGameAchievements(APIView):
         data = requests.get(url2, params=params).json()
         return Response(data=data, status=200)
 
-class GetPlayerDetails(APIView):
-    def get(self, request, *args, **kwargs):
-        url = f'{os.environ['URL_PLAYER_DETAILS']}'
-        params = {
-            'key' : f'{os.environ['STEAM_API_TOKEN']}',
-            'steamids' : self.kwargs['steamid']
-        }
-        data = requests.get(url, params=params).json()
-        return Response(data=data, status=200)
+class GetPlayerDetails(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
 
 class GetPlayerGames(APIView):
     def get(self, request, *args, **kwargs):

@@ -1,13 +1,21 @@
 from rest_framework import serializers
 from .models import *
 
+# Retrieve serialized data
 class GameSerializer(serializers.ModelSerializer):
-    appid = serializers.IntegerField(source='app_id')
-    name = serializers.CharField()
-
     class Meta:
         model = Game
-        fields = ['appid','name']
+        fields = '__all__'
+
+class DeveloperSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Developer
+        fields = '__all__'
+
+class PublisherSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Publisher
+        fields = '__all__'
 
 class ShopSerializer(serializers.ModelSerializer):
     header_image = serializers.URLField(source='cover')
@@ -51,9 +59,9 @@ class ProfileSerializer(serializers.ModelSerializer):
     avatar    = serializers.ImageField()
     banner    = serializers.ImageField()
     bio       = serializers.CharField()
-    birthdate = serializers.DateField(source='birth_date', read_only=True)
+    birth_date = serializers.DateField(read_only=True)
 
     class Meta:
         model  = Profile
         fields = ['username', 'firstname', 'lastname', 'avatar',
-                  'banner', 'bio', 'birthdate']
+                  'banner', 'bio', 'birth_date']
