@@ -22,7 +22,9 @@ class Game(models.Model):
     price = models.FloatField(null=True, blank=True)
     release_date = models.DateField(null=True, blank=True)
     age_required = models.IntegerField(null=True, blank=True)
-    owner = models.ManyToManyField(User, through='GameOwnership')
+    category = models.ManyToManyField('Category', related_name='games_with_category')
+    developer = models.ManyToManyField('Developer', related_name='games_developed')
+    publisher = models.ManyToManyField('Publisher', related_name='games_published')
 
     class Meta:
         ordering = ['name']
@@ -30,38 +32,42 @@ class Game(models.Model):
     def __str__(self):
         return self.name
 
-    def to_dict(self):
-        return {
-            'app_id': self.app_id,
-            'name': self.name,
-            'cover': self.cover,
-            'trophy_count': self.trophy_count,
-            'price': self.price,
-            'release_date': self.release_date,
-            'age_required': self.age_required,
-            'owner': self.owner.name,
-        }
-
 class Gallery(models.Model):
     url = models.URLField()
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['game']
+
+    def __str__(self):
+        return self.game.name
 
 class Trailer(models.Model):
     url = models.URLField()
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ['game']
+
+    def __str__(self):
+        return self.game.name
+
 class GameOwnership(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_games')
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    date_acquired = models.DateField()
 
     class Meta:
         unique_together = ('user', 'game')
+        ordering = ['date_acquired']
+
+    def __str__(self):
+        return f'{self.user.username} owns {self.game.name}'
 
 class Trophy(models.Model):
     name = models.CharField(max_length=150)
     icon = models.URLField()
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
-    owner = models.ManyToManyField(User, through='UserTrophy')
 
     class Meta:
         ordering = ['game', 'name']
@@ -70,16 +76,18 @@ class Trophy(models.Model):
         return self.name
 
 class UserTrophy(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_trophies')
     trophy = models.ForeignKey(Trophy, on_delete=models.CASCADE)
     achieved = models.BooleanField()
 
     class Meta:
         unique_together = ('user', 'trophy')
 
-class GameCategory(models.Model):
+    def __str__(self):
+        return f"{self.user.username} - {self.trophy.name} ({'✓' if self.achieved else '✗'})"
+
+class Category(models.Model):
     name = models.CharField(max_length=100)
-    game = models.ManyToManyField(Game)
 
     class Meta:
         ordering = ['name']
@@ -100,7 +108,6 @@ class DLC(models.Model):
 
 class Developer(models.Model):
     name = models.CharField(max_length=150)
-    game = models.ManyToManyField(Game)
 
     class Meta:
         ordering = ['name']
@@ -110,7 +117,6 @@ class Developer(models.Model):
 
 class Publisher(models.Model):
     name = models.CharField(max_length=150)
-    game = models.ManyToManyField(Game)
 
     class Meta:
         ordering = ['name']
