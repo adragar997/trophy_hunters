@@ -42,17 +42,28 @@ function LoginComponent(props) {
     }
 
     return (
-        <div className="container">
-            <h1>LOGIN</h1>
-            <form method="post" onSubmit={handleSubmit}>
-                <label htmlFor="username">Username</label>
-                <input type="text" id="username" onChange={handleChange}/>
+        <div className="flex justify-center items-center min-h-screen bg-main-page">
+            <div className="bg-white p-8 rounded-lg w-96">
+                <h1 className="text-2xl text-center mb-6">LOGIN</h1>
+                <form method="post" onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label htmlFor="username" className="block">Username</label>
+                        <input type="text" id="username" className="input" onChange={handleChange}/>
+                    </div>
 
-                <label htmlFor="password">Password</label>
-                <input type="password" id="password" onChange={handleChange}/>
+                    <div className="mb-6">
+                        <label htmlFor="password" className="block">Password</label>
+                        <input type="password" id="password" className="input" onChange={handleChange}/>
+                    </div>
 
-                <button type="submit">Iniciar sesion</button>
-            </form>
+                    <button type="submit"
+                            className="w-fit block py-2 px-4 bg-blue-700 text-white focus: rounded-lg">Iniciar sesion
+                    </button>
+                    <div className="block justify-center mt-4 mb-2">
+                        <hr/>
+                    </div>
+                </form>
+            </div>
         </div>
     )
 }
