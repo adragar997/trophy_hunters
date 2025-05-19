@@ -81,7 +81,7 @@ class FetchGamesData(AsyncAPIView):
             url = f'{os.getenv('URL_GAME_LIST')}'
             data = await AsyncFetchData().create_session(url, {})
             games = [game for game in data['applist']['apps'] if game['name']]
-
+#
             serializer = CreateGameSerializer(data=games, many=True)
             if serializer.is_valid():
                 await sync_to_async(serializer.save)()
