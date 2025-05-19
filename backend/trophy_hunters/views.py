@@ -14,7 +14,7 @@ import os
 from .models import *
 
 class GetGames(ListAPIView):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     queryset = Game.objects.all()
     serializer_class = GameSerializer
     pagination_class = PageNumberPagination
@@ -79,18 +79,18 @@ class FetchGamesData(AsyncAPIView):
     async def get(self, request, *args, **kwargs):
         try:
             url = f'{os.getenv('URL_GAME_LIST')}'
-            data = await AsyncFetchData().create_session(url)
+            data = await AsyncFetchData().create_session(url, {})
             games = [game for game in data['applist']['apps'] if game['name']]
 
-            for game in games:
-                serializer = GameSerializer(data=game)
-                if serializer.is_valid():
-                    await sync_to_async(serializer.save)()
-                else:
-                    return Response(serializer.errors, status=400)
+            serializer = CreateGameSerializer(data=games, many=True)
+            if serializer.is_valid():
+                await sync_to_async(serializer.save)()
+            else:
+                return Response(serializer.errors, status=400)
             return Response({'message': 'Games was successfully saved'}, status=200)
+
         except Exception as e:
-            return Response({'error': e}, status=500)
+            return Response({'error': str(e)}, status=500)
 
 class FetchShopData(AsyncAPIView):
     async def get(self, request, *args, **kwargs):

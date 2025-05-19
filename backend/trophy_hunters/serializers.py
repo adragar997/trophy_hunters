@@ -65,3 +65,18 @@ class ProfileSerializer(serializers.ModelSerializer):
         model  = Profile
         fields = ['username', 'firstname', 'lastname', 'avatar',
                   'banner', 'bio', 'birth_date']
+
+#CREATE
+class CreateGameSerializer(serializers.ModelSerializer):
+    appid = serializers.IntegerField(source='app_id')
+    name = serializers.CharField()
+    class Meta:
+        model = Game
+        fields = ['appid', 'name']
+
+    def create(self, validated_data):
+        app_id = validated_data.get('app_id')
+        game = Game.objects.filter(app_id=app_id).first()
+        if game:
+            return game
+        return Game.objects.create(**validated_data)

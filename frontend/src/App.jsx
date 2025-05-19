@@ -5,6 +5,7 @@ import {Route, Routes} from "react-router-dom";
 import RegisterComponent from "./components/RegisterComponent.jsx";
 import {useState} from "react";
 import GamesComponent from "./components/GamesComponent.jsx";
+import HomeComponent from "./components/HomeComponent.jsx";
 
 function App() {
     const [user, setUser] = useState()
@@ -13,9 +14,10 @@ function App() {
     <div>
         <NavComponent user={user} />
         <Routes>
-            <Route path="trophyhunters/register" element={<RegisterComponent/>}/>
-            <Route path="trophyhunters/games" element={<GamesComponent/>}/>
-            <Route path="trophyhunters/login" element={<LoginComponent setUser={setUser}/>}/>
+            <Route path="/register" element={<RegisterComponent/>}/>
+            <Route path="/games" element={<GamesComponent/>}/>
+            <Route path="/home" element={<HomeComponent/>}/>
+            <Route path="/login" element={<LoginComponent setUser={setUser}/>}/>
         </Routes>
     </div>
   )
