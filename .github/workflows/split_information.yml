@@ -22,7 +22,6 @@ jobs:
         run: |
           git fetch origin
           git switch --orphan temp-frontend
-          git rm -rf .
           cp -r frontend/* .
           git add .
           git commit -m "Update frontend from dev"
@@ -32,7 +31,6 @@ jobs:
         run: |
           git fetch origin
           git switch --orphan temp-backend
-          git rm -rf .
           cp -r backend/* .
           git add .
           git commit -m "Update backend from dev"
