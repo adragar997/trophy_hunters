@@ -6,6 +6,7 @@ admin.site.register(
         Profile,
         Game,
         Trophy,
+        Category,
         GameOwnership,
         UserTrophy,
         DLC,
@@ -13,5 +14,6 @@ admin.site.register(
         Publisher,
         Trailer,
         Gallery,
+        New,
     ]
 )

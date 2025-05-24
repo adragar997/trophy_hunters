@@ -1,15 +1,12 @@
-from django.contrib.sites import requests
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from adrf.views import APIView as AsyncAPIView
 from .fetch_data import AsyncFetchData
 from .serializers import *
 from asgiref.sync import sync_to_async
 from rest_framework.permissions import IsAuthenticated
-import requests
 import os
 from .models import *
 
@@ -18,62 +15,108 @@ class GetGames(ListAPIView):
     queryset = Game.objects.all()
     serializer_class = GameSerializer
     pagination_class = PageNumberPagination
+    paginate_by = 52
 
-class GetPlayerSteamid(APIView):
-    def get(self, request, *args, **kwargs):
-        url = f'{os.environ['URL_RESOLVE_VANITY']}'
-        params = {
-            'key' : f'{os.environ['STEAM_API_TOKEN']}',
-            'vanityurl' : self.kwargs['username'],
-        }
-        data = requests.get(url, params=params).json()
-        return Response(data=data, status=200)
+# terminar de arreglarlo
+class GetGameDetails(ListAPIView):
+    serializer_class = GameDetailSerializer()
 
-class GetGameNews(APIView):
-    def get(self, request, *args, **kwargs):
-        url = f'{os.environ['URL_GAME_NEWS']}'
-        params = {
-            'key' : f'{os.environ['STEAM_API_TOKEN']}',
-            'appid' : self.kwargs['appid'],
-        }
-        data = requests.get(url, params=params).json()
-        return Response(data=data, status=200)
+    def get_queryset(self):
+        queryset = Game.objects.prefetch_related('category', 'developer', 'gallery', 'trailer', 'publisher', 'dlc')
+        app_id = self.kwargs.get('app_id')
+        return queryset.filter(app_id=app_id)
 
-class GetGameAchievements(APIView):
-    def get(self, request, *args, **kwargs):
-        url = f'{os.environ['URL_PLAYER_GAME_ACHIEVEMENTS']}'
-        url2 = f'{os.environ['URL_GAME_SCHEME']}'
-        params = {
-            'key' : f'{os.environ['STEAM_API_TOKEN']}',
-            'appid' : self.kwargs['appid'],
-            'steamid' : self.kwargs['steamid'],
-        }
-        data = requests.get(url2, params=params).json()
-        return Response(data=data, status=200)
+class GetGameDlcs(ListAPIView):
+    serializer_class = DlcGameSerializer
+    pagination_class = PageNumberPagination
+
+    def get_queryset(self):
+        app_id = self.kwargs.get('app_id')
+        return DLC.objects.filter(game__app_id=app_id)
+
+class GetGameImages(ListAPIView):
+    serializer_class = GameGallerySerializer
+    pagination_class = PageNumberPagination
+
+    def get_queryset(self):
+        app_id = self.kwargs.get('app_id')
+        return Gallery.objects.filter(game__app_id=app_id)
+
+class GetGameTrailers(ListAPIView):
+    serializer_class = GameTrailerSerializer
+    pagination_class = PageNumberPagination
+
+    def get_queryset(self):
+        app_id = self.kwargs.get('app_id')
+        return Trailer.objects.filter(game__app_id=app_id)
+
+class GetGameNews(ListAPIView):
+    serializer_class = NewSerializer
+
+    def get_queryset(self):
+        app_id = self.kwargs['appid']
+        return New.objects.filter(game=app_id)
+
+class GetNews(ListAPIView):
+    queryset = New.objects.all()
+    serializer_class = NewSerializer
+    pagination_class = PageNumberPagination
+    page_size = 20
+
+class GetPublishers(ListAPIView):
+    queryset = Publisher.objects.all()
+    serializer_class = PublisherSerializer
+    pagination_class = PageNumberPagination
+    page_size = 20
+
+class GetPublisherGames(ListAPIView):
+    serializer_class = PublisherGameSerializer
+    pagination_class = PageNumberPagination
+    page_size = 20
+
+    def get_queryset(self):
+        publisher_name = self.kwargs['publisher_name']
+        return Game.objects.filter(publisher__name=publisher_name)
+
+class GetDevelopers(ListAPIView):
+    queryset = Developer.objects.all()
+    serializer_class = DeveloperSerializer
+    pagination_class = PageNumberPagination
+    page_size = 20
+
+class GetDeveloperGames(ListAPIView):
+    serializer_class = DeveloperGameSerializer
+    pagination_class = PageNumberPagination
+    page_size = 20
+
+    def get_queryset(self):
+        developer_name = self.kwargs['developer_name']
+        return Game.objects.filter(developer__name=developer_name)
+
+# add pagination?
+class GetGameAchievements(ListAPIView): 
+    serializer_class = AchievementSerializer
+
+    def get_queryset(self):
+        app_id = self.kwargs['appid']
+        return Trophy.objects.filter(game=app_id)
 
 class GetPlayerDetails(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = Profile.objects.all()
+    #permission_classes = [IsAuthenticated]
     serializer_class = ProfileSerializer
+    def get_queryset(self):
+        username = self.kwargs['username']
+        return Profile.objects.filter(user__username = username)
 
-class GetPlayerGames(APIView):
-    def get(self, request, *args, **kwargs):
-        url = f'{os.environ['URL_PLAYER_GAMES']}'
-        params = {
-            'key' : f'{os.environ['STEAM_API_TOKEN']}',
-            'steamid' : self.kwargs['steamid'],
-        }
-        data = requests.get(url, params=params).json()
-        return Response(data=data, status=200)
+class GetPlayerGames(ListAPIView):
+    serializer_class = OwnedGameSerializer
+    pagination_class = PageNumberPagination
+    paginate_by = 20
 
-class GetShopDetails(APIView):
-    def get(self, request, *args, **kwargs):
-        url = f'{os.environ['URL_SHOP_GAME']}'
-        params = {
-            'appids': self.kwargs['appid'],
-        }
-        data = requests.get(url, params=params).json()
-        return Response(data=data, status=200)
+    def get_queryset(self):
+        username = self.kwargs['username']
+        user = User.objects.get(username=username)
+        return user.owned_games.all()
 
 class FetchGamesData(AsyncAPIView):
     async def get(self, request, *args, **kwargs):
@@ -116,9 +159,9 @@ class Register(AsyncAPIView):
             return Response(data={'message':'success'}, status=200)
         return Response(serializer.errors, status=400)
 
-class Profile(APIView):
+"""class Profile(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, *args, **kwargs):
         profile = request.user.profile
-        serializer = ProfileSerializer(profile, context={'request': request})
-        return Response(data=serializer.data, status=200)
+        serializer = CreateProfileSerializer(profile, context={'request': request})
+        return Response(data=serializer.data, status=200)"""

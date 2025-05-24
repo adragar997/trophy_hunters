@@ -2,20 +2,96 @@ from rest_framework import serializers
 from .models import *
 
 # Retrieve serialized data
-class GameSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Game
-        fields = '__all__'
-
 class DeveloperSerializer(serializers.ModelSerializer):
     class Meta:
         model = Developer
-        fields = '__all__'
+        fields = ['name']
 
 class PublisherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Publisher
+        fields = ['name']
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['name']
+
+class PublisherGameSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(many=True)
+    class Meta:
+        model = Game
+        fields = [
+            'name','cover','trophy_count','price','release_date','age_required','category'
+        ]
+
+class DeveloperGameSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(many=True)
+    class Meta:
+        model = Game
+        fields = [
+            'name', 'cover', 'trophy_count', 'price', 'release_date', 'age_required', 'category'
+        ]
+
+class DlcGameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DLC
+        exclude = ['game']
+
+class GameSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(many=True)
+    developer = DeveloperSerializer(many=True)
+    publisher = PublisherSerializer(many=True)
+    class Meta:
+        model = Game
+        fields = [
+            'app_id','name', 'cover', 'trophy_count', 'price', 'release_date', 'age_required', 'category',
+            'developer', 'publisher'
+        ]
+
+class NewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = New
+        exclude = ['game']
+
+class AchievementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Trophy
+        exclude = ['id','game']
+
+class GameGallerySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gallery
+        exclude = ['id','game']
+
+class GameTrailerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Trailer
+        exclude = ['id','game']
+
+class GameDetailSerializer(serializers.ModelSerializer):
+    dlcs = DlcGameSerializer(many=True)
+    images = GameGallerySerializer(many=True)
+    trailers = GameTrailerSerializer(many=True)
+    class Meta:
+        exclude = ['id']
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = Profile
         fields = '__all__'
+
+class OwnedGameSerializer(serializers.ModelSerializer):
+    game = GameSerializer()
+    class Meta:
+        model = GameOwnership
+        exclude = ['user','id']
 
 class ShopSerializer(serializers.ModelSerializer):
     header_image = serializers.URLField(source='cover')
@@ -52,20 +128,6 @@ class RegisterSerializer(serializers.Serializer):
 
         return Profile.objects.create(user=user, birth_date=birthdate,**validated_data)
 
-class ProfileSerializer(serializers.ModelSerializer):
-    username  = serializers.CharField(source='user.username', read_only=True)
-    firstname = serializers.CharField(source='user.first_name', read_only=True)
-    lastname  = serializers.CharField(source='user.last_name', read_only=True)
-    avatar    = serializers.ImageField()
-    banner    = serializers.ImageField()
-    bio       = serializers.CharField()
-    birth_date = serializers.DateField(read_only=True)
-
-    class Meta:
-        model  = Profile
-        fields = ['username', 'firstname', 'lastname', 'avatar',
-                  'banner', 'bio', 'birth_date']
-
 #CREATE
 class CreateGameSerializer(serializers.ModelSerializer):
     appid = serializers.IntegerField(source='app_id')
@@ -80,3 +142,17 @@ class CreateGameSerializer(serializers.ModelSerializer):
         if game:
             return game
         return Game.objects.create(**validated_data)
+
+class CreateProfileSerializer(serializers.ModelSerializer):
+    username  = serializers.CharField(source='user.username', read_only=True)
+    firstname = serializers.CharField(source='user.first_name', read_only=True)
+    lastname  = serializers.CharField(source='user.last_name', read_only=True)
+    avatar    = serializers.ImageField()
+    banner    = serializers.ImageField()
+    bio       = serializers.CharField()
+    birth_date = serializers.DateField(read_only=True)
+
+    class Meta:
+        model  = Profile
+        fields = ['username', 'firstname', 'lastname', 'avatar',
+                  'banner', 'bio', 'birth_date']
