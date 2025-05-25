@@ -1,0 +1,32 @@
+name: Sync frontend and backend
+
+on:
+  push:
+    branches:
+      - dev
+
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dev branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Necesario para acceder a otras ramas
+
+      - name: Copy frontend folder
+        run: |
+          mkdir ../temp-folder
+          cp -r frontend/* ../temp-folder/
+
+      - name: Checkout frontend branch
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout frontend
+          rm -rf ./frontend/*
+          cp -r ../temp-folder/* ./frontend/
+          git add .
+          git commit -m "Sync frontend from dev" || echo "No changes to commit"
+          git push origin frontend --force
