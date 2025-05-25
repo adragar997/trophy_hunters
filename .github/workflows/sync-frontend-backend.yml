@@ -28,7 +28,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git checkout frontend || git checkout --orphan frontend
           find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
-          cp -r ../temp-folder/* ./frontend/
+          cp -r ../temp-folder/. .
           git add .
           git commit -m "Sync frontend from dev" || echo "No changes to commit"
           git push origin frontend --force
