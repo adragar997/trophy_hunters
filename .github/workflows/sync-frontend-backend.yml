@@ -17,12 +17,18 @@ jobs:
         with:
           fetch-depth: 0  # Necesario para acceder a otras ramas
 
+      - name: Copy frontend folder
+        run: |
+          mkdir ../temp-folder
+          cp -r frontend/* ../temp-folder/
+
       - name: Checkout frontend branch
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git checkout frontend || git checkout --orphan frontend
-          rm -rf ./backend/
-          git add frontend/
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          cp -r ../temp-folder/* ./frontend/
+          git add .
           git commit -m "Sync frontend from dev" || echo "No changes to commit"
           git push origin frontend --force
