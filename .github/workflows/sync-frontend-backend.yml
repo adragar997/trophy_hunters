@@ -22,7 +22,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git checkout frontend || git checkout --orphan frontend
-          rm -rf backend
+          rm -rf ./backend/
           git add frontend/
           git commit -m "Sync frontend from dev" || echo "No changes to commit"
           git push origin frontend --force
