@@ -6,7 +6,7 @@ function NavComponent(props) {
     return (
         <header>
           <nav>
-              <div className="flex justify-center">
+              <div className="flex justify-between">
                 {user ?
                     <div>
                         Bienvenido {user.username}
