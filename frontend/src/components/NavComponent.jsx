@@ -11,7 +11,7 @@ function NavComponent(props) {
                         <li>Bienvenido {user.username}</li>
                     </ul>
                     :
-                    <div>
+                    <div className="flex justify-between">
                         <Link to="/register">Registro</Link>
                         <Link to="/login">Login</Link>
                     </div>
