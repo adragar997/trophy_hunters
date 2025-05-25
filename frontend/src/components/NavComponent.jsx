@@ -11,14 +11,10 @@ function NavComponent(props) {
                         <li>Bienvenido {user.username}</li>
                     </ul>
                     :
-                    <ul>
-                        <li>
-                            <Link to="/register">Registr</Link>
-                        </li>
-                        <li>
-                            <Link to="/login">Login</Link>
-                        </li>
-                    </ul>
+                    <div>
+                        <Link to="/register">Registro</Link>
+                        <Link to="/login">Login</Link>
+                    </div>
                 }
           </nav>
         </header>
