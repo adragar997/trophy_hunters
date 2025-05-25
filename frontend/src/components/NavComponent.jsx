@@ -12,7 +12,7 @@ function NavComponent(props) {
                         Bienvenido {user.username}
                     </div>
                     :
-                    <div className="justify-between">
+                    <div>
                         <Link to="/register">Registro</Link>
                         <Link to="/login">Login</Link>
                     </div>
