@@ -24,7 +24,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout frontend
+          git checkout frontend || git checkout --orphan frontend
           rm -rf ./frontend/*
           cp -r ../temp-folder/* ./frontend/
           git add .
