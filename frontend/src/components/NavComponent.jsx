@@ -17,7 +17,7 @@ function NavComponent(props) {
                         <Link to="/login">Login</Link>
                     </div>
                 }
-                  <input type="text" placeholder="buscar"/>
+                  <input type="text" placeholder="buscar "/>
               </div>
           </nav>
         </header>
