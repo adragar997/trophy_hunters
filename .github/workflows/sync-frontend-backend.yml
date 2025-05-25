@@ -15,7 +15,7 @@ jobs:
       - name: Checkout dev branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Necesario para acceder a otras ramas
+          fetch-depth: 0
 
       - name: Copy frontend folder
         run: |
@@ -32,3 +32,27 @@ jobs:
           git add .
           git commit -m "Sync frontend from dev" || echo "No changes to commit"
           git push origin frontend --force
+
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dev branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Copy backend folder
+        run: |
+          mkdir ../temp-folder
+          cp -r backend ../temp-folder/
+
+      - name: Checkout backend branch
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout backend || git checkout --orphan backend
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          cp -r ../temp-folder/backend .
+          git add .
+          git commit -m "Sync backend from dev" || echo "No changes to commit"
+          git push origin backend --force
