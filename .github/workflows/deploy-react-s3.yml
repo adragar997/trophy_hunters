@@ -1,9 +1,10 @@
 name: Deploy react S3
 
 on:
-  push:
-    branches:
-      - frontend
+  workflow_run:
+    workflows: ["Sync frontend and backend"]
+    types:
+      - completed
 
 jobs:
   deploy-S3:
@@ -15,8 +16,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
 
+      - name: Install dependecies
+        run: |
+          cd frontend
+          npm install
+
       - name: Build project
-        run: npm run build
+        run: |
+          cd frontend
+          npm run build
 
       - name: Deploy S3
         env:
@@ -25,4 +33,5 @@ jobs:
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           AWS_REGION: 'us-east-1'
         run: |
+          cd frontend
           aws s3 sync dist/ s3://www.trophyhunters.tech --delete
