@@ -13,7 +13,7 @@ function NavComponent(props) {
                     :
                     <ul>
                         <li>
-                            <Link to="/register">Registro</Link>
+                            <Link to="/register">Registr</Link>
                         </li>
                         <li>
                             <Link to="/login">Login</Link>
