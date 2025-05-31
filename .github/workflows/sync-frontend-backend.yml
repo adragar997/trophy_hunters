@@ -110,7 +110,6 @@ jobs:
             cd proyecto/trophy_hunters
             git fetch origin backend
             git reset --hard origin/backend
-            cd proyecto/trophy_hunters/backend
             docker compose down
             docker compose up -d --build
           EOF
