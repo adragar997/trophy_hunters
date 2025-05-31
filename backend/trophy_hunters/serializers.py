@@ -17,20 +17,28 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['name']
 
-class PublisherGameSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(many=True)
-    class Meta:
-        model = Game
-        fields = [
-            'name','cover','trophy_count','price','release_date','age_required','category'
-        ]
-
-class DeveloperGameSerializer(serializers.ModelSerializer):
+class CategoryGameSerializer(serializers.ModelSerializer):
     category = CategorySerializer(many=True)
     class Meta:
         model = Game
         fields = [
             'name', 'cover', 'trophy_count', 'price', 'release_date', 'age_required', 'category'
+        ]
+
+class PublisherGameSerializer(serializers.ModelSerializer):
+    publisher = PublisherSerializer(many=True)
+    class Meta:
+        model = Game
+        fields = [
+            'name','cover','trophy_count','price','release_date','age_required','publisher'
+        ]
+
+class DeveloperGameSerializer(serializers.ModelSerializer):
+    developer = DeveloperSerializer(many=True)
+    class Meta:
+        model = Game
+        fields = [
+            'name', 'cover', 'trophy_count', 'price', 'release_date', 'age_required', 'developer'
         ]
 
 class DlcGameSerializer(serializers.ModelSerializer):
@@ -129,19 +137,86 @@ class RegisterSerializer(serializers.Serializer):
         return Profile.objects.create(user=user, birth_date=birthdate,**validated_data)
 
 #CREATE
+class CreateCategorySerializer(serializers.ModelSerializer):
+    description = serializers.CharField(source='name')
+    class Meta:
+        model = Category
+        fields = ['description']
+
+class CreateScreenshotSerializer(serializers.ModelSerializer):
+    path_full = serializers.URLField(source='url')
+    class Meta:
+        model = Gallery
+        fields = ['path_full']
+
+class CreateMovieSerializer(serializers.ModelSerializer):
+    mp4_max = serializers.URLField(source='url')
+
+    class Meta:
+        model = Trailer
+        fields = ['mp4_max']
+
+    def to_internal_value(self, data):
+        mp4_max_url = data.get('mp4', {}).get('max')
+        return {'url': mp4_max_url}
+
+class CreateAchievementSerializer(serializers.Serializer):
+    total = serializers.IntegerField()
+
 class CreateGameSerializer(serializers.ModelSerializer):
-    appid = serializers.IntegerField(source='app_id')
+    steam_appid = serializers.IntegerField(source='app_id')
+    header_image = serializers.URLField(source='cover')
     name = serializers.CharField()
+    required_age = serializers.IntegerField(source='age_required', required=False)
+    categories = CreateCategorySerializer(many=True, required=False)
+    developers = serializers.ListField(child=serializers.CharField(), required=False)
+    publishers = serializers.ListField(child=serializers.CharField(), required=False)
+    screenshots = CreateScreenshotSerializer(many=True, required=False)
+    movies = CreateMovieSerializer(many=True, required=False)
+
     class Meta:
         model = Game
-        fields = ['appid', 'name']
+        fields = [
+            'steam_appid',
+            'header_image',
+            'name',
+            'required_age',
+            'categories',
+            'developers',
+            'publishers',
+            'screenshots',
+            'movies'
+        ]
 
     def create(self, validated_data):
-        app_id = validated_data.get('app_id')
-        game = Game.objects.filter(app_id=app_id).first()
-        if game:
-            return game
-        return Game.objects.create(**validated_data)
+        app_id = validated_data.pop('app_id')
+        categories_data = validated_data.pop('categories',[])
+        developers_data = validated_data.pop('developers',[])
+        publishers_data = validated_data.pop('publishers',[])
+        screenshots_data = validated_data.pop('screenshots',[])
+        movies_data = validated_data.pop('movies',[])
+
+        game, _ = Game.objects.get_or_create(app_id=app_id, **validated_data)
+
+        for movie_data in movies_data:
+            movie, _ = Trailer.objects.get_or_create(game=game, **movie_data)
+
+        for screenshot_data in screenshots_data:
+            screenshot, _ = Gallery.objects.get_or_create(url=screenshot_data['url'], game=game)
+
+        for category_data in categories_data:
+            category, _ = Category.objects.get_or_create(name=category_data['name'])
+            game.category.add(category)
+
+        for developer_name in developers_data:
+            developer, _ = Developer.objects.get_or_create(name=developer_name)
+            game.developer.add(developer)
+
+        for publisher_name in publishers_data:
+            publisher, _ = Publisher.objects.get_or_create(name=publisher_name)
+            game.publisher.add(publisher)
+
+        return game
 
 class CreateProfileSerializer(serializers.ModelSerializer):
     username  = serializers.CharField(source='user.username', read_only=True)

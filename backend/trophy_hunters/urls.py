@@ -16,13 +16,14 @@ urlpatterns = [
     path('publishers/<str:publisher_name>', views.GetPublisherGames.as_view(), name='GetPublisherGames'),
     path('developers/', views.GetDevelopers.as_view(), name='GetDevelopers'),
     path('developers/<str:developer_name>', views.GetDeveloperGames.as_view(), name='GetDeveloperGames'),
+    path('categories/', views.GetCategories.as_view(), name='GetCategories'),
+    path('categories/<str:category_name>', views.GetCategoryGames.as_view(), name='GetCategoryGames'),
     path('user/<str:username>', views.GetPlayerDetails.as_view(), name='GetPlayer'),
     path('user/<str:username>/games/', views.GetPlayerGames.as_view(), name='GetPlayerGames'),
     path('achievements/<int:appid>', views.GetGameAchievements.as_view(), name='GetGameAchievements'),
 
     # FETCH URLS
     path('fetch-games/', views.FetchGamesData.as_view(), name='FetchGamesData'),
-    path('fetch-shop/<int:appid>', views.FetchShopData.as_view(), name='FetchShopData'),
 
     # TOKENS
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

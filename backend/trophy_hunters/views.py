@@ -5,6 +5,7 @@ from rest_framework.generics import ListAPIView
 from adrf.views import APIView as AsyncAPIView
 from .fetch_data import AsyncFetchData
 from .serializers import *
+from .filters import *
 from asgiref.sync import sync_to_async
 from rest_framework.permissions import IsAuthenticated
 import os
@@ -13,9 +14,8 @@ from .models import *
 class GetGames(ListAPIView):
     #permission_classes = [IsAuthenticated]
     queryset = Game.objects.all()
+    filterset_class = GameFilter
     serializer_class = GameSerializer
-    pagination_class = PageNumberPagination
-    paginate_by = 52
 
 # terminar de arreglarlo
 class GetGameDetails(ListAPIView):
@@ -28,7 +28,6 @@ class GetGameDetails(ListAPIView):
 
 class GetGameDlcs(ListAPIView):
     serializer_class = DlcGameSerializer
-    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         app_id = self.kwargs.get('app_id')
@@ -36,7 +35,6 @@ class GetGameDlcs(ListAPIView):
 
 class GetGameImages(ListAPIView):
     serializer_class = GameGallerySerializer
-    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         app_id = self.kwargs.get('app_id')
@@ -44,7 +42,6 @@ class GetGameImages(ListAPIView):
 
 class GetGameTrailers(ListAPIView):
     serializer_class = GameTrailerSerializer
-    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         app_id = self.kwargs.get('app_id')
@@ -66,6 +63,7 @@ class GetNews(ListAPIView):
 class GetPublishers(ListAPIView):
     queryset = Publisher.objects.all()
     serializer_class = PublisherSerializer
+    filterset_class = PublisherFilter
     pagination_class = PageNumberPagination
     page_size = 20
 
@@ -81,6 +79,7 @@ class GetPublisherGames(ListAPIView):
 class GetDevelopers(ListAPIView):
     queryset = Developer.objects.all()
     serializer_class = DeveloperSerializer
+    filterset_class = DeveloperFilter
     pagination_class = PageNumberPagination
     page_size = 20
 
@@ -92,6 +91,22 @@ class GetDeveloperGames(ListAPIView):
     def get_queryset(self):
         developer_name = self.kwargs['developer_name']
         return Game.objects.filter(developer__name=developer_name)
+
+class GetCategories(ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    filterset_class = CategoryFilter
+    pagination_class = PageNumberPagination
+    page_size = 20
+
+class GetCategoryGames(ListAPIView):
+    serializer_class = CategoryGameSerializer
+    pagination_class = PageNumberPagination
+    paginate_by = 20
+
+    def get_queryset(self):
+        category_name = self.kwargs['category_name']
+        return Game.objects.filter(category__name=category_name)
 
 # add pagination?
 class GetGameAchievements(ListAPIView): 
@@ -121,34 +136,22 @@ class GetPlayerGames(ListAPIView):
 class FetchGamesData(AsyncAPIView):
     async def get(self, request, *args, **kwargs):
         try:
+            fetch_data = AsyncFetchData()
             url = f'{os.getenv('URL_GAME_LIST')}'
-            data = await AsyncFetchData().create_session(url, {})
-            games = [game for game in data['applist']['apps'] if game['name']]
-#
-            serializer = CreateGameSerializer(data=games, many=True)
-            if serializer.is_valid():
-                await sync_to_async(serializer.save)()
-            else:
-                return Response(serializer.errors, status=400)
-            return Response({'message': 'Games was successfully saved'}, status=200)
-
+            data = await fetch_data.create_session(url, {})
+            for game in data['applist']['apps']:
+                if game['name']:
+                    app_id = str(game['appid'])
+                    url_details = f'{os.getenv('URL_GAME_DETAILS')}'
+                    details = await fetch_data.create_session(url_details, {'appids': app_id})
+                    if details[app_id]['success'] and details[app_id]['data']['type'] == 'game':
+                        serializer = CreateGameSerializer(data= details[app_id]['data'])
+                        if serializer.is_valid():
+                            await sync_to_async(serializer.save)()
+                        else:
+                            return Response(serializer.errors, status=400)
         except Exception as e:
             return Response({'error': str(e)}, status=500)
-
-class FetchShopData(AsyncAPIView):
-    async def get(self, request, *args, **kwargs):
-        try:
-            url = f'{os.getenv('URL_SHOP_GAME')}'
-            params = {
-                'appids': self.kwargs['appid'],
-            }
-            data = await AsyncFetchData().create_session(url, params)
-
-            for game_data in data[self.kwargs['appid']]['data']:
-                serializer = ShopSerializer(data=game_data)
-            return Response(data=data, status=200)
-        except Exception as e:
-            return Response({'error': e}, status=500)
 
 class Register(AsyncAPIView):
     parser_classes = [MultiPartParser, FormParser]
