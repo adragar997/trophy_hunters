@@ -26,6 +26,7 @@ services:
     depends_on:
       - db
     environment:
+      - DJANGO_SECRET_KEY=django-insecure-khd@m1xs(92q)1etkp9$v$uv%&8kewkkb7nbvnjea5*53m!7@=
       - DEBUG=1
       - DB_NAME=trophyhunters_db
       - DB_USER=admin
