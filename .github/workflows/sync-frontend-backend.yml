@@ -108,7 +108,7 @@ jobs:
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             rm -rf proyecto/trophy_hunters/backend
-            git clone -b backend https://github.com/adragar997/trophy_hunters.git proyecto/trophy_hunters/backend
+            git clone -b backend https://github.com/adragar997/trophy_hunters.git proyecto/trophy_hunters/
             cd proyecto/trophy_hunters/backend
             docker compose down
             docker compose up -d --build
