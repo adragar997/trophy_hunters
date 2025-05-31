@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-khd@m1xs(92q)1etkp9$v$uv%&8kewkkb7nbvnjea5*53m!7@=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['api.trophyhunters.tech', 'localhost', '127.0.0.1']
 
 
 # Application definition
