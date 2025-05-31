@@ -132,7 +132,7 @@ class GetPlayerGames(ListAPIView):
         username = self.kwargs['username']
         user = User.objects.get(username=username)
         return user.owned_games.all()
-#
+
 class FetchGamesData(AsyncAPIView):
     async def get(self, request, *args, **kwargs):
         try:
