@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: trophyhunters_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 121067
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    container_name: django_app
+    command: >
+      sh -c "python manage.py makemigrations &&
+           python manage.py migrate &&
+           python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "80:8000"
+    depends_on:
+      - db
+    environment:
+      - DJANGO_SECRET_KEY=django-insecure-khd@m1xs(92q)1etkp9$v$uv%&8kewkkb7nbvnjea5*53m!7@=
+      - DEBUG=1
+      - DB_NAME=trophyhunters_db
+      - DB_USER=admin
+      - DB_PASSWORD=121067
+      - DB_HOST=db
+      - DB_PORT=5432
+
+volumes:
+  postgres_data:
