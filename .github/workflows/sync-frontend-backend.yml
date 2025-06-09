@@ -112,5 +112,5 @@ jobs:
             git reset --hard origin/backend
             cd backend
             docker compose down --volumes --rmi all --remove-orphans
-            docker compose up -d --build
+            docker compose up --build -d
           EOF
