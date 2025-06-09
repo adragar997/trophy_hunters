@@ -21,6 +21,8 @@ services:
            python3 manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
+    ports:
+      - "80:8000"
     depends_on:
       - db
     environment:
@@ -40,29 +42,6 @@ services:
       - DB_PASSWORD=121067
       - DB_HOST=db
       - DB_PORT=5432
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.django.rule=Host(`api.trophyhunters.tech`)"
-      - "traefik.http.routers.django.entrypoints=websecure"
-      - "traefik.http.routers.django.tls.certresolver=letsencrypt"
-
-  traefik:
-    image: traefik:v2.10
-    container_name: traefik
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./letsencrypt:/letsencrypt
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.trophyhunters.tech`)"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
 
   redis:
     image: redis:7
