@@ -13,7 +13,7 @@ function GamesComponent() {
     const [games, setGames] = useState([])
     const MotionGrid = motion.create(Grid);
 
-    const fetchGames = async (url = 'http://127.0.0.1:8000/games/') => {
+    const fetchGames = async (url = 'http://api.trophyhunters.tech/games/') => {
         const res = await fetch(url);
         const data = await res.json();
         setGames(data.results);
@@ -22,7 +22,7 @@ function GamesComponent() {
 
     const handleSearch = async (e) => {
         if (e.key === "Enter")
-        await fetch(`http://127.0.0.1:8000/games/?name=${e.target.value}`)
+        await fetch(`http://api.trophyhunters.tech/games/?name=${e.target.value}`)
             .then(res => res.json())
             .then(data => setGames(data.results))
     }

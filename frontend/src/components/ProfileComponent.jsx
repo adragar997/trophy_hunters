@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import { useUserContext } from "./Context/UserContext.jsx";
-
-// Iconos proporcionados
 import UnlockedOverlayIcon from '../assets/static/unlocked.png';
 import TrophyIcon from '../assets/static/trophy.png'; // Importa el icono de trofeo
-
-// Componente GameWithTrophies
 function GameWithTrophies({ game }) {
   const [open, setOpen] = useState(false);
   const hasTrophies = game.game.trophies && game.game.trophies.length > 0;
@@ -89,7 +85,7 @@ export default function UserProfile() {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/users/${profile?.username}/games/`
+        `http://api.trophyhunters.tech/users/${profile?.username}/games/`
       );
       const data = await response.json();
       setGames(data.results);

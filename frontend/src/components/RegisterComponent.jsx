@@ -38,7 +38,7 @@ function RegisterComponent() {
         payload.append("lastname",  formData.lastname);
         payload.append("birthdate", formData.birthdate);
 
-        const response = await fetch('http://127.0.0.1:8000/register/',{
+        const response = await fetch('http://api.trophyhunters.tech/register/',{
             method: "POST",
             body: payload,
         })

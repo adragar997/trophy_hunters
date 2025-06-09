@@ -31,7 +31,7 @@ export default function GameDetails() {
     };
 
     useEffect(() => {
-        fetch(`http://127.0.0.1:8000/games/${id}`)
+        fetch(`http://api.trophyhunters.tech/games/${id}`)
             .then(res => res.json())
             .then(data => setGame(data))
     }, [id]);

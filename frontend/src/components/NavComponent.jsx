@@ -23,7 +23,7 @@ function NavComponent() {
                         "☰"
                     ) : profile?.profile?.avatar ? (
                         <img
-                            src={`http://127.0.0.1:8000${profile.profile.avatar}`}
+                            src={`http://api.trophyhunters.tech${profile.profile.avatar}`}
                             alt="avatar"
                             className="w-10 h-10 rounded-full"
                         />
@@ -60,7 +60,7 @@ function NavComponent() {
                         <div onClick={() => setIsOpen(!isOpen)} className="flex items-center gap-2 cursor-pointer">
                             <img
                                 src={profile?.profile?.avatar
-                                    ? `http://127.0.0.1:8000${profile.profile.avatar}`
+                                    ? `http://api.trophyhunters.tech${profile.profile.avatar}`
                                     : DefaultAvatar}
                                 className="w-[55px] h-[55px] rounded-[50%]"
                                 alt="Avatar"

@@ -32,7 +32,7 @@ export default function SettingsComponent() {
         payload.append("bio", formData.bio);
         payload.append("birthdate", formData.birthdate);
 
-        const response = await fetch('http://127.0.0.1:8000/update/', {
+        const response = await fetch('http://api.trophyhunters.tech/update/', {
             method: "PATCH",
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem('access')}`
@@ -43,11 +43,6 @@ export default function SettingsComponent() {
         if (response.status === 200) {
             navigate("/")
         }
-    }
-
-    const handleChange = (e) => {
-        const {id, value} = e.target
-        setFormData(prev => ({...prev, [id]: value}))
     }
 
     const handleImage = (e) => {

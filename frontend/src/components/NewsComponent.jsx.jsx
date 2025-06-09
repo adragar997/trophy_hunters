@@ -9,7 +9,7 @@ export default function NewsComponent() {
     const [pagination, setPagination] = useState({next: null, previous: null});
     const {isLoggedIn, profile} = useUserContext()
 
-    const fetchData = async (url = 'http://127.0.0.1:8000/news/') => {
+    const fetchData = async (url = 'http://api.trophyhunters.tech/news/') => {
         const res = await fetch(url);
         const data = await res.json();
         setNews(data.results);

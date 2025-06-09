@@ -14,7 +14,7 @@ export default function HomeComponent() {
 
     const fetchData = async () => {
         try {
-            const gamesRes = await fetch('http://127.0.0.1:8000/games/');
+            const gamesRes = await fetch('http://api.trophyhunters.tech/games/');
             const gamesData = await gamesRes.json();
             setGames(gamesData.results);
         } catch (error) {
@@ -23,7 +23,7 @@ export default function HomeComponent() {
         }
 
         try {
-            const newsRes = await fetch('http://127.000.1:8000/news/');
+            const newsRes = await fetch('http://api.trophyhunters.tech/news/');
             const newsData = await newsRes.json();
             setNews(newsData.results);
         } catch (error) {
@@ -45,20 +45,17 @@ export default function HomeComponent() {
         autoplaySpeed: 3000,
     };
 
-    // Definimos una altura mínima consistente para todos los sliders/contenedores de contenido
     const minContentHeightClass = "min-h-[350px] sm:min-h-[400px] lg:min-h-[380px]";
 
     return (
         <Grid container justifyContent="center" spacing={3} className="text-white font-open p-5">
-            {/* Grid para "New Games" */}
-            {/* Todas las secciones tendrán size={{xs: 12, md: 12, lg: 6}} para uniformidad */}
             {games.length > 0 && (
                 <Grid size={{xs: 12, md: 12, lg: 6}} className="mt-5">
                     <h1 className="text-3xl sm:text-4xl lg:text-[40px] w-fit border-b-4 border-orange-400 mb-4 pb-1">New Games:</h1>
                     <Slider {...settings}>
                         {games.map(game => (
                             <div key={game.app_id} className={`overflow-y-auto scroll-hidden p-2 ${minContentHeightClass}`}>
-                                <div className="flex flex-col lg:flex-row gap-4 h-full"> {/* h-full para el flex container */}
+                                <div className="flex flex-col lg:flex-row gap-4 h-full">
                                     <Grid size={{xs: 12, md: 12, lg: 6}} className="flex justify-center items-center">
                                         <Link to={`/games/${game.app_id}`} className="block w-full h-full">
                                             <img
@@ -101,7 +98,6 @@ export default function HomeComponent() {
                 </Grid>
             )}
 
-            {/* Grid para "News" */}
             <Grid size={{xs: 12, md: 12, lg: 6}} className="mt-5">
                 <h1 className="text-3xl sm:text-4xl lg:text-[40px] w-fit border-b-4 border-orange-400 mb-4 pb-1">News:</h1>
                 <Slider {...settings}>
@@ -136,8 +132,6 @@ export default function HomeComponent() {
                 </Slider>
             </Grid>
 
-            {/* Grid para "Coming Soon" */}
-            {/* También con size={{xs: 12, md: 12, lg: 6}} para uniformidad */}
             <Grid size={{xs: 12, md: 12, lg: 6}} className="mt-5">
                 <div className={`p-2 h-full flex items-center justify-center ${minContentHeightClass}`}>
                     <motion.div

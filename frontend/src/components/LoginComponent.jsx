@@ -33,7 +33,7 @@ function LoginComponent() {
     }, []);
 
     const getProfile = async () => {
-        return await fetch('http://127.0.0.1:8000/profile/me/', {
+        return await fetch('http://api.trophyhunters.tech/profile/me/', {
             headers: { "Authorization": `Bearer ${localStorage.getItem('access')}` },
         }).then(res => res.json())
     }
@@ -42,7 +42,7 @@ function LoginComponent() {
         e.preventDefault()
         setSnackbar({...snackbar, open: false});
         try {
-            const {access, refresh} = await fetch("http://127.0.0.1:8000/token/", {
+            const {access, refresh} = await fetch("http://api.trophyhunters.tech/token/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password })
