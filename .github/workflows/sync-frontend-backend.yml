@@ -111,6 +111,6 @@ jobs:
             git fetch origin backend
             git reset --hard origin/backend
             cd backend
-            docker compose down --volumes
+            docker compose down --volumes --rmi all --remove-orphans
             docker compose up -d --build
           EOF
