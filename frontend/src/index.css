@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.input-forms {
+    @apply bg-neutral-500 text-white font-open font-normal text-xl placeholder-white rounded-xl px-4 py-2 w-full focus:outline-none;
+}
+
+.input-settings {
+    @apply bg-neutral-500 text-white font-open font-normal text-xl placeholder-white rounded-xl px-4 py-2 w-full focus:outline-none ;
+}
+
+.button {
+     @apply p-2 pl-5 pr-5 bg-gradient-to-r from-cyan-500 to-teal-500 text-black rounded-3xl hover:bg-teal-800 text-xl font-normal tracking-widest font-open;
+}
+
+.scroll-hidden {
+  overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-hidden::-webkit-scrollbar {
+  display: none;
+}
