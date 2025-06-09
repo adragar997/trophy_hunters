@@ -1,125 +1,176 @@
-# Tabla de contenido
+# Documentación TrophyHunters
 
-## Introduccion.
+## Esta es una aplicación creada y diseñada por Alexander Drapala García.
 
-- Introducción.
-- Finalidad.
-- Objetivos.
-- Medios necesarios.
-- Planificación.
+Con esta app, podemos obtener los juegos de steam, sus trofeos asociados, los juegos de un usuario, los trofeos que ha ido consiguiendo y si lo tiene o no desbloqueados, además de poder ver las noticias de cada juego.
 
-## Realización del Proyecto.
+## Índice
 
-- Trabajos realizados.
-- Problemas encontrado.
-- Modificaciones sobre el proyecto planteado inicialmente
-- Posibles mejoras al proyecto
-- Bibliografía.
+- [Configuración del área de trabajo](#configuración-del-área-de-trabajo)
+    - [Clonar el repositorio ](#clonar-el-repositorio)
+    - [Crear entorno virtual y activarlo](#crear-entorno-virtual-oculto-y-activarlo)
+    - [Instalar requirements.txt](#instalar-requirementstxt)
+    - [Instalar dependecias del frontend](#instalar-dependecias-del-frontend)
+    - [Instalar docker y docker-compose](#instalar-docker-y-docker-compose)
+        - [Windows](#windows)
+        - [Linux](#linux)
+    - [Arrancar el backend](#arrancar-el-backend)
+- [Empezar a desarrollar](#empezar-a-desarrollar)
+    - [Estructura de TrophyHunters](#estructura-de-trophyhunters)
+- [Despliegue](#despliegue)
+    - [EC2](#ec2)
+    - [S3](#s3)
 
-## Introducción.
+## Configuración del área de trabajo
 
-### Introducción.
+### Clonar el repositorio:
 
-Crear una aplicación web que muestre los juegos nuevos que salgan, las noticias de cada uno de ellos
-si disponen de tales, mostrar o buscar juegos con su número de trofeos, marcar aquellos juegos que sean gratuitos o de pago,
-mostrar los juegos jugados recientemente por el usuario y que pueda todos sus juegos, además, podrá ver que trofeos tiene
-desbloqueado y cuales les falta por desbloquear.
+`git clone urlHtpp`
+ 
+### Crear entorno virtual oculto y activarlo
 
-Servir una api, que permita obtener diferentes datos para futuros desarrolladores y la cual va a permitir que nuestra aplicación web
-pueda obtener todos estos datos
+Entrar en la carpeta trophy_hunters (si hay mas seguimos entrando) hasta que veamos las carpetas *backend* y *frontend*
 
-### Finalidad.
+`python -m venv .venv` 
 
-Tener a disposición de forma muy accesible y sencilla el poder ver los trofeos que te quedan
-por sacar de un juego, aquellos trofeos que tienes, juegos a los que has jugado reciéntemente, buscar juegos y ver si son de pago o no.
+`source .venv/bin/activate`
 
-### Objetivos.
+### Instalar requirements.txt
 
-Vamos a poder tanto iniciar sesión como registrarnos, actualizar nuestro perfil, vamos a poder buscar u observar los juegos que hay, los trofeos que tienen
-ver si son gratis o no, ver las ultimas noticas de los juegos (actualizacions, corrección de errores...),
-ver todas las noticas con su correspondiente botón de ir a la fuente de la noticia, poder ver nuestros juegos jugados reciéntemente,
-poder saber que trofeos hemos logrado obtener de cada uno de nuestros juegos.
+Dentro de la carpeta de backend esta el archivo requirements.txt para instalar todas las dependecias que usaremos.
 
-Tambien damos la posibilidad de que futuros desarrolladores que tengan una idea similiar a la nuestra, puedan acceder a nuestra api,
-para que puedan programar su propia aplicación sin tener que pasar por docuemntaciones poco familiares y robustas.
+`pip install -r requirements.txt`
 
-### Medios necesarios.
+### Instalar dependecias del frontend
 
-- Un PC de configuración media/alta para manejar localmente servidores y desarrollar.
-- VScode o Pycharm para desarrollar.
-- Docker, Docker-compose
-- Cuenta en aws con privilegios suficientes.
-- Máquina en aws EC2 donde irá todo el backend de la aplicación (django, redis, celery, celery beat, postgreSQL)
-- Bucket en aws S3 donde irá nuetro frontend
-- Git para poder desarrollar funcionalidades entre ramas y combinarlas, entre muchas más funcionalidades.
-- Cuenta de Github.
-- Actions de Github que hagan el despliegue automáticamente.
+Dentro de la carpeta frontend ejecutamos el siguiente comando:
 
-### Planificación.
+`npm install`
 
-## Realización del Proyecto.
+### Instalar docker y docker-compose
 
-### Problemas encontrados
+#### Windows
 
-- Problemas al serializar las fechas ya que steam devuelve fechas en distintos formatos.
-- Obtener el contador de los trofeos mediante el serializador.
-- Impelementación de steam.
-- Crear los juegos.
-- Crear los trofeos.
-- Obtener los juegos de un usuario e identificar cuales tiene y cuales no.
-- Problemas con el slider de react.
+Para instalar docker en windows instalamos el launcher de [*Docker desktop*](https://www.docker.com/products/docker-desktop/)
 
-### Trabajos realizados
+#### Linux
 
-- Creación de la app trophy_hunters de django.
-- Creación de los endpoints de nuestra api.
-- Creacion de sus vistas.
-- Creación de los modelos que se va a usar.
-- Creacion de los serializares que crean datos y de aquellos que los muestran.
-- Añadir los ajustes necesarios a nuestro backend.
-- Añadir filtros para poder filtrar nuestra información de la base de datos y sea mucho más accesible.
-- Añadir drf-spectacular para que se genere una documentación automática en endpoint que permite visualizar todos nuestros endpoints.
-- Añadir JWT en django para autenticar a los usuarios del front.
-- Cambiar la base de datos a postgreSQL.
-- Implementar celery + celery beat para las task programadas.
-- Creación de las task programadas.
-- Creación del horario de las tareas.
-- Crear requirements.txt para poder instalar las dependencias de nuestro backend de forma automática con docker.
-- Dockerizar el proyecto.
-- Creación del frontend con react + vite.
-- Uso de tailwindcss para darle estilos a nuestra app de react.
-- Uso de MUI para meter componentes como mensajes.
-- Creación de los componentes necesarios de react.
-- Creación del contexto user para pasar información entre componentes para saber si esta logged, su perfil, etc.
-- Meter imágenes para su uso.
-- Crear los actions de github que permitirán el despliegue automatico de nuestra app (frontend + backend)
-- Crear máquina EC2 en aws para meter nuestro backend.
-- Implementar las políticas de seguridad de la máquina para permitir el tráfico saliente y entrante.
-- Crear un bucket en una S3 para poder meter nuestro frontend.
+```
+sudo apt update
+sudo apt upgrade
 
-### Modificaciones sobre el proyecto planteado inicialmente
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+```
 
-- Iniciar sesión con Steam
-- Usar Kubernetes
-- Implementar IA
+### Arrancar el backend
 
-### Posibles mejores al proyecto.
+SI USAS UN .ENV LUEGO TIENES QUE AÑADIR ESAS VARIABLES AL COMPOSE
 
-- Añadir estadísticas de cuenta, juegos y trofeos.
-- Donaciones.
-- Crear guías de juegos.
-- Iniciar sesion con multiples plataformas (google, facebook...)
-- Mejoras de estilos e interfaz de usuario.
+Para que nuestro backend comience a funcionar, necesitamos levantar el contenedor (dentro de la carpeta backend donde esta el docker-compose.yml) ejecutando el siguiente comando:
 
-### Bibliografía.
+- -d levanta el contenedor en modo demon (background) 
+- --build forzamos a que vuelva hacer una imagen del la app con los cambios que aplicamos (si hemos desarrollado algo)
 
-- [Stackoverflow](https://stackoverflow.com/questions)
-- [Django docs](https://docs.djangoproject.com/en/5.2/)
-- [Drf-spectacular](https://drf-spectacular.readthedocs.io/en/latest/readme.html#installation)
-- [drf-jwt](https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html)
-- [drf](https://www.django-rest-framework.org/)
-- [Django-filters](https://django-filter.readthedocs.io/en/stable/guide/usage.html)
-- [Curso React](https://openwebinars.net/academia/aprende/react/24794/)
-- [React doc](https://react.dev/)
-- [Steam doc](https://developer.valvesoftware.com/wiki/Steam_Web_API#GetNewsForApp_.28v0001.29)
-- [Steam doc 2](https://wiki.teamfortress.com/wiki/WebAPI#General_interfaces)
+`docker compose up -d --build`
+
+### Arrancar el frontend
+
+Para que nuestro fronend comience a funcionar, necesitamos arrancar el servidor (dentro de la carpeta frontend) ejecutando el siguiente comando:
+
+`npm run dev`
+
+## Empezar a desarrollar
+
+### Estructura de TrophyHunters
+
+```
+trophy_hunters
+├───.github
+│   └───workflows
+│           sync-frontend-backend.yml
+│          
+├───backend
+│   ├───config
+│   │   │   asgi.py
+│   │   │   celery.py
+│   │   │   settings.py
+│   │   │   urls.py
+│   │   │   wsgi.py
+│   │   │   __init__.py
+│   │   │   
+│   │   └───__pycache__
+│   ├───letsencrypt 
+│   ├───media
+│   │   ├───profile_banners
+│   │   │       
+│   │   └───profile_pictures
+│   └───trophy_hunters
+│       │   admin.py
+│       │   apps.py
+│       │   fetch_data.py
+│       │   filters.py
+│       │   models.py
+│       │   serializers.py
+│       │   tasks.py
+│       │   tests.py
+│       │   urls.py
+│       │   views.py
+│       │   __init__.py
+│       ├───migrations
+│       │   │   __init__.py
+│       │   │   
+│       │   └───__pycache__
+│       │           __init__.cpython-313.pyc
+│       │           
+│       └───__pycache__
+│               admin.cpython-313.pyc
+│               apps.cpython-313.pyc
+│               fetch_data.cpython-313.pyc
+│               filters.cpython-313.pyc
+│               models.cpython-313.pyc
+│               serializers.cpython-313.pyc
+│               tasks.cpython-313.pyc
+│               urls.cpython-313.pyc
+│               views.cpython-313.pyc
+│               __init__.cpython-313.pyc
+│               
+└───frontend
+    │   .gitignore
+    │   eslint.config.js
+    │   index.html
+    │   package-lock.json
+    │   package.json
+    │   postcss.config.js
+    │   tailwind.config.js
+    │   vite.config.js
+    └───src
+        │   
+        ├───assets
+        │   └───static
+        │           
+        └───components
+            │   
+            └───Context
+                    
+
+```
+
+## Despliegue
+
+Al hacer un push a dev, se activan los **Github actions** que replican el contenido de las carpetas **backend** y **frontend**, estas se suben a la rama remota de cada una de ellas e inmediátamente después, se despliegan a sus máquinas correspondientes en **AWS**.
+
+### EC2
+
+Máquina ubuntu que acepta peticiones 0.0.0.0/0 y tiene los puertos activados 443 HTTPS, 80 HTTP, 8080, 22 SSH.
+
+### S3
+
+
+Un bucket que permite las conexiones externas y la cual se sube la carpeta dist/ al hacer `npm run build`. Todo esta automatizado por el **action**.
+
+
+
+
+
+
