@@ -1,5 +1,8 @@
-import {useState, useEffect} from "react";
-import '../assets/css/Register.css';
+import {useState} from "react";
+import Logo from "../assets/static/trophyhunters.png";
+import {motion} from "framer-motion";
+import {Alert, Snackbar} from "@mui/material";
+import {useNavigate} from "react-router-dom";
 
 function RegisterComponent() {
     const [formData, setFormData] = useState(
@@ -14,6 +17,13 @@ function RegisterComponent() {
             'birthdate': ''
         }
     )
+    const navigate = useNavigate()
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success", // 'success' | 'error'
+    });
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -21,20 +31,25 @@ function RegisterComponent() {
 
         payload.append("username",  formData.username);
         payload.append("password",  formData.password);
-        payload.append("avatar",  formData.avatar);
-        payload.append("banner",  formData.banner);
+        if (formData.avatar) payload.append("avatar", formData.avatar);
+        if (formData.banner) payload.append("banner", formData.banner);
         payload.append("bio",       formData.bio);
         payload.append("firstname", formData.firstname);
         payload.append("lastname",  formData.lastname);
         payload.append("birthdate", formData.birthdate);
 
-        const response = await fetch('http://127.0.0.1:8000/trophyhunters/register/',{
+        const response = await fetch('http://127.0.0.1:8000/register/',{
             method: "POST",
             body: payload,
         })
 
-        const data = await response.json()
-        console.log(data)
+        if (response.status === 200) {
+            setSnackbar({open: true, message: "Signed up successfully", severity: "success"});
+            await sleep(1000)
+            navigate("/login")
+        } else {
+            setSnackbar({open: true, message: "Something went wrong", severity: "error"});
+        }
     }
 
     const handleChange = (e) => {
@@ -48,35 +63,74 @@ function RegisterComponent() {
     }
 
     return (
-        <div className='container'>
-            <h1>Formulario de registro</h1>
-            <form method="post" onSubmit={handleSubmit}>
-                <label htmlFor="username">Usuario</label>
-                <input type="text" id="username" name="username" onChange={handleChange}/>
+        <div className="flex flex-col items-center justify-center min-h-screen">
+            <motion.img
+                src={Logo}
+                className="w-72"
+                initial={{y: -300, opacity: 0}}
+                animate={{y: 0, opacity: 1}}
+                transition={{duration: 1}}
+            >
+            </motion.img>
+            <motion.div
+                style={{backgroundColor: '#D9D9D920'}}
+                className="relative p-8 pt-10 rounded-3xl w-96"
+                initial={{y: 300, opacity: 0}}
+                animate={{y: 0, opacity: 1}}
+                transition={{duration: 1}}
+            >
+                <form method="post" onSubmit={handleSubmit}>
+                    <div className="flex flex-col gap-5">
+                        <div className="flex gap-3">
+                            <input type="text" id="username" name="username" placeholder="Username"
+                                   className="input-forms"
+                                   required="True" onChange={handleChange}/>
 
-                <label htmlFor="password">Contraseña</label>
-                <input type="password" id="password" name="password" onChange={handleChange}/>
+                            <input type="password" id="password" name="password" placeholder="Password"
+                                   required="True" className="input-forms" onChange={handleChange}/>
+                        </div>
+                        <div className="flex gap-3">
+                            <input type="text" id="firstname" name="firstname" className="input-forms"
+                                   placeholder="First Name" onChange={handleChange}/>
 
-                <label htmlFor="avatar">Foto de avatar</label>
-                <input type="file" id="avatar" name="avatar" onChange={handleImage}/>
+                            <input type="text" id="lastname" name="lastname" className="input-forms"
+                                   placeholder="Last Name" onChange={handleChange}/>
+                        </div>
 
-                <label htmlFor="banner">Banner</label>
-                <input type="file" id="banner" name="banner" onChange={handleImage}/>
+                        <div className="flex gap-3">
+                            <input type="file" id="avatar" name="avatar" className="file:bg-gradient-to-r file:from-cyan-500 file:to-teal-500 file:text-black file:font-semibold file:py-2 file:px-4 file:rounded-full file:border-0 file:cursor-pointer
+             w-[500px] min-w-[120px] overflow-hidden file:w-full"
+                                   onChange={handleImage}/>
 
-                <label htmlFor="bio">Sobre mi</label>
-                <textarea id="bio" cols="30" rows="10" name="bio" onChange={handleChange}></textarea>
-                
-                <label htmlFor="firstname">Nombre</label>
-                <input type="text" id="firstname" name="firstname" onChange={handleChange}/>
+                            <input type="file" id="banner" name="banner" className="file:bg-gradient-to-r file:from-cyan-500 file:to-teal-500 file:text-black file:font-semibold file:py-2 file:px-4 file:rounded-full file:border-0 file:cursor-pointer
+             w-[500px] min-w-[120px] overflow-hidden file:w-full"
+                                   onChange={handleImage}/>
+                        </div>
 
-                <label htmlFor="lastmame">Apellidos</label>
-                <input type="text" id="lastname" name="lastname" onChange={handleChange}/>
+                        <input type="date" id="birthdate" name="birthdate" className="input-forms"
+                               placeholder="Birthday" onChange={handleChange}/>
 
-                <label htmlFor="birthdate">Cumpleaños</label>
-                <input type="date" id="birthdate" name="birthdate" onChange={handleChange}/>
+                        <textarea id="bio" cols="20" rows="5" name="bio" className="input-forms"
+                                  placeholder="About me" onChange={handleChange}></textarea>
 
-                <button type="submit">Registrarse</button>
-            </form>
+                        <div className="flex justify-center pb-2">
+                            <button type="submit"
+                                    className="button">Sign up
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </motion.div>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={3000}
+                onClose={() => setSnackbar({...snackbar, open: false})}
+                anchorOrigin={{vertical: "top", horizontal: "center"}}
+            >
+                <Alert severity={snackbar.severity} variant="filled" sx={{width: "100%"}}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     )
 }

@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-from mmap import PAGESIZE
 from pathlib import Path
 from dotenv import load_dotenv
 import os
@@ -26,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['api.trophyhunters.tech', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['api.trophyhunters.tech', 'localhost', '127.0.0.1','www.trophyhunters.tech']
 
 
 # Application definition
@@ -45,6 +44,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'corsheaders',
     'django_filters',
+    'django_celery_beat',
     'trophy_hunters.apps.TrophyHuntersConfig',
     'adrf',
 ]
@@ -73,6 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -85,10 +86,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    #'default': {
-    #    'ENGINE': 'django.db.backends.sqlite3',
-    #    'NAME': BASE_DIR / 'db.sqlite3',
-    #},
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # },
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get("DB_NAME", "trophyhunters_db"),
@@ -97,6 +98,7 @@ DATABASES = {
         'HOST': os.environ.get("DB_HOST", "db"),
         'PORT': os.environ.get("DB_PORT", "5432"),
     }
+
 }
 
 
@@ -130,11 +132,15 @@ USE_I18N = True
 
 USE_TZ = True
 
+SITE_ID = 1
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -161,3 +167,40 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
+
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+
+CELERY_BEAT_SCHEDULE = {
+    'fetch-user-games': {
+        'task': 'trophy_hunters.tasks.user_games',
+        'schedule': 5*60,
+        'args': (),
+    },
+    'fetch-games': {
+        'task': 'trophy_hunters.tasks.games',
+        'schedule': 3*60,
+        'args': (),
+    },
+    'fetch-user-achievements': {
+        'task': 'trophy_hunters.tasks.user_game_achievements',
+        'schedule': 2*60,
+        'args': (),
+    },
+    'reset-users': {
+        'task': 'trophy_hunters.tasks.reset_users',
+        'schedule': 4*60,
+        'args': (),
+    },
+}
+
+CELERY_ONCE = {
+    'backend': 'celery_once.backends.Redis',
+    'settings': {
+        'url': 'redis://redis:6379/0',
+        'default_timeout': 60 * 10,
+    }
+}
+
+LOGIN_REDIRECT_URL = 'http://localhost:5173'
+LOGOUT_REDIRECT_URL = 'http://localhost:5173/login'

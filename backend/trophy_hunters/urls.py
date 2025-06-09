@@ -1,6 +1,6 @@
 from django.urls import path
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from . import  views
 
 urlpatterns = [
@@ -18,20 +18,22 @@ urlpatterns = [
     path('developers/<str:developer_name>', views.GetDeveloperGames.as_view(), name='GetDeveloperGames'),
     path('categories/', views.GetCategories.as_view(), name='GetCategories'),
     path('categories/<str:category_name>', views.GetCategoryGames.as_view(), name='GetCategoryGames'),
-    path('user/<str:username>', views.GetPlayerDetails.as_view(), name='GetPlayer'),
-    path('user/<str:username>/games/', views.GetPlayerGames.as_view(), name='GetPlayerGames'),
+    path('users/<str:username>', views.GetPlayerDetails.as_view(), name='GetPlayer'),
+    path('users/<str:username>/games/', views.GetPlayerGames.as_view(), name='GetPlayerGames'),
     path('achievements/<int:appid>', views.GetGameAchievements.as_view(), name='GetGameAchievements'),
 
-    # FETCH URLS
-    path('fetch-games/', views.FetchGamesData.as_view(), name='FetchGamesData'),
-
-    # TOKENS
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh' ),
-
     # REGISTER
-    path('register/', views.Register.as_view(), name='register'),
-    #path('register/me/', views.Profile.as_view(), name='profile'),
+    path('register/', views.RegisterProfile.as_view(), name='RegisterProfile'),
+
+    #UPDATE
+    path('update/', views.UpdateProfile.as_view(), name='UpdateProfile'),
+
+    #PROFILE
+    path('profile/me/', views.GetProfile.as_view(), name='profile'),
+
+    #TOKEN
+    path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 
     #API DOCS
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

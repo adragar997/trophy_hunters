@@ -1,30 +1,25 @@
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.generics import ListAPIView
-from adrf.views import APIView as AsyncAPIView
-from .fetch_data import AsyncFetchData
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+from adrf.views import APIView as AsyncAPIView, APIView
 from .serializers import *
 from .filters import *
 from asgiref.sync import sync_to_async
 from rest_framework.permissions import IsAuthenticated
-import os
 from .models import *
 
 class GetGames(ListAPIView):
-    #permission_classes = [IsAuthenticated]
-    queryset = Game.objects.all()
+    queryset = Game.objects.all().order_by('-release_date')
     filterset_class = GameFilter
     serializer_class = GameSerializer
 
-# terminar de arreglarlo
-class GetGameDetails(ListAPIView):
-    serializer_class = GameDetailSerializer()
+class GetGameDetails(RetrieveAPIView):
+    serializer_class = GameDetailSerializer
+    lookup_field = 'app_id'
 
     def get_queryset(self):
-        queryset = Game.objects.prefetch_related('category', 'developer', 'gallery', 'trailer', 'publisher', 'dlc')
-        app_id = self.kwargs.get('app_id')
-        return queryset.filter(app_id=app_id)
+        return Game.objects.all()
 
 class GetGameDlcs(ListAPIView):
     serializer_class = DlcGameSerializer
@@ -55,7 +50,7 @@ class GetGameNews(ListAPIView):
         return New.objects.filter(game=app_id)
 
 class GetNews(ListAPIView):
-    queryset = New.objects.all()
+    queryset = New.objects.all().order_by('-date')
     serializer_class = NewSerializer
     pagination_class = PageNumberPagination
     page_size = 20
@@ -74,7 +69,7 @@ class GetPublisherGames(ListAPIView):
 
     def get_queryset(self):
         publisher_name = self.kwargs['publisher_name']
-        return Game.objects.filter(publisher__name=publisher_name)
+        return Game.objects.filter(publishers__name__icontains=publisher_name)
 
 class GetDevelopers(ListAPIView):
     queryset = Developer.objects.all()
@@ -86,11 +81,10 @@ class GetDevelopers(ListAPIView):
 class GetDeveloperGames(ListAPIView):
     serializer_class = DeveloperGameSerializer
     pagination_class = PageNumberPagination
-    page_size = 20
 
     def get_queryset(self):
         developer_name = self.kwargs['developer_name']
-        return Game.objects.filter(developer__name=developer_name)
+        return Game.objects.filter(developers__name__icontains=developer_name)
 
 class GetCategories(ListAPIView):
     queryset = Category.objects.all()
@@ -102,14 +96,12 @@ class GetCategories(ListAPIView):
 class GetCategoryGames(ListAPIView):
     serializer_class = CategoryGameSerializer
     pagination_class = PageNumberPagination
-    paginate_by = 20
 
     def get_queryset(self):
         category_name = self.kwargs['category_name']
-        return Game.objects.filter(category__name=category_name)
+        return Game.objects.filter(categories__name__icontains=category_name)
 
-# add pagination?
-class GetGameAchievements(ListAPIView): 
+class GetGameAchievements(ListAPIView):
     serializer_class = AchievementSerializer
 
     def get_queryset(self):
@@ -117,7 +109,6 @@ class GetGameAchievements(ListAPIView):
         return Trophy.objects.filter(game=app_id)
 
 class GetPlayerDetails(ListAPIView):
-    #permission_classes = [IsAuthenticated]
     serializer_class = ProfileSerializer
     def get_queryset(self):
         username = self.kwargs['username']
@@ -126,45 +117,50 @@ class GetPlayerDetails(ListAPIView):
 class GetPlayerGames(ListAPIView):
     serializer_class = OwnedGameSerializer
     pagination_class = PageNumberPagination
-    paginate_by = 20
 
     def get_queryset(self):
         username = self.kwargs['username']
         user = User.objects.get(username=username)
-        return user.owned_games.all()
+        return GameOwnership.objects.filter(user=user).order_by('game__name')
 
-class FetchGamesData(AsyncAPIView):
-    async def get(self, request, *args, **kwargs):
+class GetProfile(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+class RegisterProfile(AsyncAPIView):
+    parser_classes = [MultiPartParser, FormParser]
+    async def post(self, request):
         try:
-            fetch_data = AsyncFetchData()
-            url = f'{os.getenv('URL_GAME_LIST')}'
-            data = await fetch_data.create_session(url, {})
-            for game in data['applist']['apps']:
-                if game['name']:
-                    app_id = str(game['appid'])
-                    url_details = f'{os.getenv('URL_GAME_DETAILS')}'
-                    details = await fetch_data.create_session(url_details, {'appids': app_id})
-                    if details[app_id]['success'] and details[app_id]['data']['type'] == 'game':
-                        serializer = CreateGameSerializer(data= details[app_id]['data'])
-                        if serializer.is_valid():
-                            await sync_to_async(serializer.save)()
-                        else:
-                            return Response(serializer.errors, status=400)
+            serializer = RegisterSerializer(data=request.data)
+            if serializer.is_valid():
+                await sync_to_async(serializer.save)()
+                return Response(data={'message': 'success'}, status=200)
+            return Response(serializer.errors, status=400)
         except Exception as e:
             return Response({'error': str(e)}, status=500)
 
-class Register(AsyncAPIView):
+class UpdateProfile(APIView):
     parser_classes = [MultiPartParser, FormParser]
-    async def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            await sync_to_async(serializer.save)()
-            return Response(data={'message':'success'}, status=200)
-        return Response(serializer.errors, status=400)
-
-"""class Profile(APIView):
     permission_classes = [IsAuthenticated]
-    def get(self, request, *args, **kwargs):
-        profile = request.user.profile
-        serializer = CreateProfileSerializer(profile, context={'request': request})
-        return Response(data=serializer.data, status=200)"""
+    async def patch(self, request, *args, **kwargs):
+        try:
+            profile_instance, created = await sync_to_async(Profile.objects.get_or_create)(user=request.user)
+
+            serializer = UpdateProfileSerializer(instance=profile_instance, data=request.data, partial=True)
+
+            if await sync_to_async(serializer.is_valid)(raise_exception=True):
+                await sync_to_async(serializer.save)()
+                return Response(
+                    {"message": "Perfil actualizado con éxito.", "profile": serializer.data},
+                    status=200
+                )
+
+        except Exception as e:
+            return Response(
+                {"error": "Ocurrió un error en el servidor: " + str(e)},
+                status=500
+            )

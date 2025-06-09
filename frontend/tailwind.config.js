@@ -5,8 +5,10 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {
-        'main-page' : '#1c2a40',
+      fontFamily: {
+        open: ['"Open Sans"'],
+      },
+      fontSize:{
       }
     },
   },
