@@ -131,12 +131,12 @@ export default function UserProfile() {
       <div className="min-h-screen">
         <header className="relative w-full h-60 bg-cover bg-center"
           style={{
-            backgroundImage: `url('http://127.0.0.1:8000${profile.profile?.banner}')`,
+            backgroundImage: `url('http://api.trophyhunters.tech/${profile.profile?.banner}')`,
           }}>
           <div className="absolute inset-0 bg-black opacity-40"></div>
           <div className="relative z-10 flex items-center h-full px-4 sm:px-6 md:px-8">
             <img
-              src={`http://127.0.0.1:8000${profile.profile?.avatar}`}
+              src={`http://api.trophyhunters.tech/${profile.profile?.avatar}`}
               alt="Avatar"
               className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border-4 border-yellow-400 shadow-xl object-cover flex-shrink-0"
             />

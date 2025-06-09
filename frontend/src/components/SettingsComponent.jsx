@@ -68,7 +68,7 @@ export default function SettingsComponent() {
                 <div className="flex flex-row gap-7">
                     <div>
                         <img src={profile?.profile.avatar
-                            ? `http://127.0.0.1:8000${profile.profile.avatar}`
+                            ? `http://api.trophyhunters.tech/${profile.profile.avatar}`
                             : DefaultAvatar} alt="avatar"
                              className="w-25 h-25 rounded-[50%]"/>
                     </div>
